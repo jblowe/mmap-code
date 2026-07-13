@@ -4,7 +4,7 @@
 #
 PHOTO_DIR=/mnt/images/LaosPhotos
 source /home/ubuntu/.profile
-cd /home/ubuntu/blacklight-mmap/mmap-solr/
+cd /home/ubuntu/mmap-code/mmap-solr/
 
 # update derivatives
 time ./make_derivatives.sh ${PHOTO_DIR}/originals ${PHOTO_DIR}/derivatives >> mmap-derivatives.txt 2>&1

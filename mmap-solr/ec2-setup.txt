@@ -1,7 +1,7 @@
 
 # being some reminders about how to set up mmap solr cores and images on ec2
 
-cd ../blacklight-mmap/
+cd ../mmap-code/
 export CONNECT_STRING='postgresql://...'
 rm -f nohup.out ;  nohup ./solrETL-artifacts.sh mmap &
 # get rid of hidden files from derivatives directory
