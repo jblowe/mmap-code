@@ -1,3 +1,4 @@
+fields = [
     ('Column', 'column'),
     ('Id', 'id'),
     ('Mmap Artifact Id', 'mmap_artifact_id_s'),
@@ -47,4 +48,5 @@
     ('Txtimagename4', 'txtimagename4_s'),
     ('Txtimagename5', 'txtimagename5_s'),
     ('Txtdrawingname', 'txtdrawingname_s'),
-    ('Flag For Check', 'flag_for_check'),
+    ('Flag For Check', 'flag_for_check')
+    ]
