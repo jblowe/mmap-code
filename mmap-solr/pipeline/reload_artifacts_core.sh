@@ -25,11 +25,11 @@ curl -S -s "http://localhost:8983/solr/${TENANT}-${CORE}/update" --data '<commit
 ##############################################################################
 # extract metadata
 ##############################################################################
-source export_tables.sh
+source pipeline/artifact_subtables.sh
 for table in "${tables[@]}"
 do
   echo "table: solr_data/${table}"
-  time psql -R"@@" -A -d "$CONNECT_STRING" -f solr_sql/${table}.sql | \
+  time psql -R"@@" -A -d "$CONNECT_STRING" -f sql-generator/solr_sql/${table}.sql | \
     perl -pe 's/[\r\n\t]/ /g;s/\|/\t/g;s/\@\@/\n/g' > solr_data/${table}.csv
   perl -i -pe 's/ 00:00:00//g;s#Q:.##g;' solr_data/${table}.csv
   ##############################################################################
@@ -52,10 +52,10 @@ do
   # generate solr schema <copyField> elements, just in case.
   # also generate parameters for POST to solr (to split _ss fields properly)
   ##############################################################################
-  ./genschema.sh solr_data/${table}
+  ./pipeline/generate_solr_schema_fragment.sh solr_data/${table}
   grep -v "Record_No" solr_data/4solr.${table}.csv > d8.csv
   cat solr_data/${table}.header4Solr.csv d8.csv | perl -pe 's/␥/|/g' > d9.csv
-  #python capitalize.py d9.csv d10.csv 2 title
+  #python other/possibly-superseded/capitalize.py d9.csv d10.csv 2 title
   mv d9.csv d10.csv
   ##############################################################################
   # compute _i values for _dt values (to support BL date range searching)
@@ -74,7 +74,7 @@ do
   ##############################################################################
   ss_string=`cat solr_data/${table}.uploadparms.txt`
   time curl -X POST -S -s "http://localhost:8983/solr/${TENANT}-${CORE}/update/csv?commit=true&header=true&separator=%09&${ss_string}f.blob_ss.split=true&f.blob_ss.separator=,&encapsulator=\\" -T solr_data/4solr.${table}.csv -H 'Content-type:text/plain; charset=utf-8' &
-  time python3 evaluate.py solr_data/4solr.${table}.csv solr_data/temp.${table}.csv > solr_data/4solr.fields.${table}.counts.csv &
+  time python3 pipeline/validate_solr_csv.py solr_data/4solr.${table}.csv solr_data/temp.${table}.csv > solr_data/4solr.fields.${table}.counts.csv &
   # wait for POSTs to Solr to finish
   wait
 done

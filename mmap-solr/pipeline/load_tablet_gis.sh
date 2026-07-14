@@ -1,4 +1,4 @@
-python csv_to_postgres_load.py \
+python pipeline/csv_to_postgres.py \
   "$1" \
   '"public"."tblSite"' \
   "$2" \

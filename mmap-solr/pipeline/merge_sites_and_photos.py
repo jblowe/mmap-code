@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-merge_sites.py
+merge_sites_and_photos.py
 
 Merge archaeological site records with per-site photo records, grouped by TYPE_s.
 
@@ -24,7 +24,7 @@ Concatenated values use "|" as a separator.
 The output file is "|" separated as well.
 
 Usage:
-    python merge_sites.py mmap-dbsites.csv mmap-site-photos.csv merged_sites.csv
+    python merge_sites_and_photos.py mmap-dbsites.csv mmap-site-photos.csv merged_sites.csv
 """
 
 import csv
@@ -162,7 +162,7 @@ def main(argv=None):
 
     if len(argv) != 3:
         sys.stderr.write(
-            "Usage: python merge_sites.py "
+            "Usage: python merge_sites_and_photos.py "
             "mmap-dbsites.csv mmap-site-photos.csv merged_sites.csv\n"
         )
         sys.exit(1)

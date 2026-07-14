@@ -4,7 +4,11 @@ if [ ! "${CONNECT_STRING}" ]; then
   echo set env var CONNECT_STRING please!
   exit 1
 fi
-psql -R"@@" -A -d "$CONNECT_STRING" -f extract_sites.sql | \
+
+# header for the site-photos intermediate csv (was mmap-site-photos.header.csv)
+SITE_PHOTOS_HEADER="THUMBNAIL_ss\tDATE_s\tSITE_s\tTYPE_s\tFILENAME_s"
+
+psql -R"@@" -A -d "$CONNECT_STRING" -f pipeline/extract_sites_view.sql | \
   perl -pe 's/[\r\n\t]/ /g;s/\|/\t/g;s/\@\@/\n/g' > mmap-dbsites.csv
 perl -i -pe 'if (/Site_Name/) {s/\t/_s\t/g;s/$/_s/;s/Record_No_s/id/;tr/A-Z/a-z/;s/ /_/g;s/\?//g;}' mmap-dbsites.csv
 grep site_name mmap-dbsites.csv | perl -pe 's/ +/_/g' > mmap-dbsites.header.csv
@@ -37,16 +41,17 @@ sites0.tmp > sites1.tmp
 perl -ne '@x=split/\t/;print if (@x[3] =~ / /)' sites1.tmp | cut -f1 | perl -pe 's#(.*)\/.*#\1#' | uniq
 
 perl -ne '@x=split/\t/;next if @x[3] =~ /( |JPG)/; print if /\.(jpg|jpeg|tif|gif|png|webp)/i' sites1.tmp > sites2.tmp
-cat mmap-site-photos.header.csv sites2.tmp > mmap-site-photos.csv
-perl -pe 's/\t/\n/g;s/\r//g;' mmap-site-photos.header.csv > mmap-site-photos.fields.txt
-python3 evaluate.py mmap-site-photos.csv sites3.tmp
+printf '%b\n' "${SITE_PHOTOS_HEADER}" > mmap-site-photos.csv
+cat sites2.tmp >> mmap-site-photos.csv
+printf '%b\n' "${SITE_PHOTOS_HEADER}" | perl -pe 's/\t/\n/g;s/\r//g;' > mmap-site-photos.fields.txt
+python3 pipeline/validate_solr_csv.py mmap-site-photos.csv sites3.tmp
 
 # merge them
-python merge_sites.py mmap-dbsites.csv mmap-site-photos.csv mmap-sites.csv
+python pipeline/merge_sites_and_photos.py mmap-dbsites.csv mmap-site-photos.csv mmap-sites.csv
 head -1 mmap-sites.csv | perl -pe 's/\t/\n/g;s/\r//g;' > mmap-sites.fields.txt
 
 # load the whole shebang into solr core mmap-sites
-# ./makesolrcores.sh mmap-sites
-./solrETL-sites.sh mmap-sites mmap-sites
+# (core creation, if ever needed by hand: other/possibly-superseded/makesolrcores.sh mmap-sites)
+./pipeline/load_sites_into_solr.sh mmap-sites mmap-sites
 
 rm *.tmp

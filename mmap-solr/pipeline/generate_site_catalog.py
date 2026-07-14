@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# make_report.py — generates standalone HTML report for merged_sites.tsv
+# generate_site_catalog.py — generates standalone HTML report for merged_sites.tsv
 
 import csv
 import sys
@@ -35,10 +35,10 @@ def make_site_anchor(row: dict) -> str:
 
 def render_front_matter() -> str:
     # title page, then intro, each separated by an explicit page break
-    title_html = read_snippet("title_page.html")
+    title_html = read_snippet("pipeline/title_page.html")
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     title_html = title_html.replace("{DATE}", timestamp)
-    intro_html = read_snippet("introduction.html")
+    intro_html = read_snippet("pipeline/introduction.html")
     return "\n".join([
         '<div class="front-matter">', title_html, '</div>',
         '<div class="page-break"></div>',
@@ -567,7 +567,7 @@ def render_all_sites_map(rows: List[dict]) -> str:
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python make_report.py merged_sites.tsv <local|aws> > report.html", file=sys.stderr)
+        print("Usage: python generate_site_catalog.py merged_sites.tsv <local|aws> > report.html", file=sys.stderr)
         sys.exit(1)
 
     global URL_PREFIX

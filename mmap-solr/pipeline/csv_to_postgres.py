@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-csv_to_postgres_load.py
+csv_to_postgres.py
 
 Load a CSV into a PostgreSQL table using a two-column mapping config CSV.
 
@@ -13,7 +13,7 @@ Example:
     "Photo","photo_url"
 
 Usage:
-    python csv_to_postgres_load.py input.csv "MySchema"."MyTable" "postgresql://user:pass@host:5432/dbname" mapping.csv
+    python csv_to_postgres.py input.csv "MySchema"."MyTable" "postgresql://user:pass@host:5432/dbname" mapping.csv
 
 Notes:
 - This script treats Postgres identifiers as CASE-SENSITIVE by *quoting* them.

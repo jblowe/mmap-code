@@ -6,7 +6,7 @@ CORE=$2
 ##############################################################################
 # generate multivalued field schema (in csv cells)
 ##############################################################################
-./generate_solr_splits.sh ${TABLE}
+./pipeline/generate_solr_upload_params.sh ${TABLE}
 ss_string=$(cat ${TABLE}.uploadparms.txt)
 ##############################################################################
 # TODO: compute _i values for _dt values (to support BL date range searching)
@@ -33,6 +33,6 @@ time curl -X POST -S -s \
   "http://localhost:8983/solr/${CORE}/update/csv?commit=true&header=true&separator=%09&${ss_string}f.blob_ss.split=true&f.blob_ss.separator=,&encapsulator=\\" \
   -H 'Content-type:text/plain; charset=utf-8' \
   -T ${TABLE}.csv
-time python3 evaluate.py ${TABLE}.csv tmp > counts.${TABLE}.csv
+time python3 pipeline/validate_solr_csv.py ${TABLE}.csv tmp > counts.${TABLE}.csv
 rm tmp
 date
